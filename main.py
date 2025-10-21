@@ -8,6 +8,8 @@ from utils import get_custom_logger
 from lerobot.robots.so100_follower import SO100Follower, SO100FollowerConfig
 from lerobot.teleoperators.keyboard import KeyboardTeleop, KeyboardTeleopConfig
 
+from utils.control_utils import p_control
+
 logger = get_custom_logger()
 
 
@@ -23,6 +25,26 @@ def get_current_position(robot: SO100Follower):
             current_positions[motor_name] = value
 
     return current_positions
+
+def p_control_loop(lrobot: SO100Follower, rrobot: SO100Follower, keyboard: KeyboardTeleop, kp=0.5, control_freq=50):
+    logger.info(f"Starting P control loop, control frequency: {control_freq}, proportional gain: {kp}")
+
+    interval = 1.0 / control_freq
+    momentum = 1
+    last_kb_action = None
+    while True:
+        try:
+            kb_action, positions = p_control(lrobot, rrobot, keyboard, momentum)
+            if kb_action:
+                lrobot.send_action(positions)
+            if kb_action == last_kb_action:
+                momentum += 1
+            else:
+                momentum = 1
+                last_kb_action = kb_action
+            time.sleep(interval)
+        except Exception as e:
+            pass
 
 
 def move_to_zero_position(robot: SO100Follower, duration=3.0, kp=0.5):
@@ -111,56 +133,11 @@ def main():
         # Read starting joint angles
         logger.info("Reading starting joint angles...")
         current_positions = get_current_position(lrobot)
-        print(current_positions)
 
-        move_to_zero_position(lrobot, duration=3.0)
-        move_to_zero_position(rrobot, duration=3.0)
-
-        # Initialize target positions to current positions (integers)
-        # target_positions = {
-        #     'shoulder_pan': 0.0,
-        #     'shoulder_lift': 0.0,
-        #     'elbow_flex': 0.0,
-        #     'wrist_flex': 0.0,
-        #     'wrist_roll': 0.0,
-        #     'gripper': 0.0
-        # }
-        # while True:
-        #     try:
-        #         kb_action = keyboard.get_action()
-        #         if kb_action:
-        #             for key, value in keyboard_action.items():
-        #                 if key == 'x':
-        #                     return
-
-        #                 # Joint control mapping
-        #                 joint_controls = {
-        #                     'q': ('shoulder_pan', -1),    # Joint1 decrease
-        #                     'a': ('shoulder_pan', 1),     # Joint1 increase
-        #                     'w': ('shoulder_lift', -1),   # Joint2 decrease
-        #                     's': ('shoulder_lift', 1),    # Joint2 increase
-        #                     'e': ('elbow_flex', -1),      # Joint3 decrease
-        #                     'd': ('elbow_flex', 1),       # Joint3 increase
-        #                     'r': ('wrist_flex', -1),      # Joint4 decrease
-        #                     'f': ('wrist_flex', 1),       # Joint4 increase
-        #                     't': ('wrist_roll', -1),      # Joint5 decrease
-        #                     'g': ('wrist_roll', 1),       # Joint5 increase
-        #                     'y': ('gripper', -1),         # Joint6 decrease
-        #                     'h': ('gripper', 1),          # Joint6 increase
-        #                 }
-
-        #                 if key in joint_controls:
-        #                     joint_name, delta = joint_controls[key]
-        #                     if joint_name in target_positions:
-        #                         current_target = target_positions[joint_name]
-        #                         new_target = int(current_target + delta)
-        #                         target_positions[joint_name] = new_target
-        #                         print(
-        #                             f"Updated target position {joint_name}: {current_target} -> {new_target}")
-
-        #     except Exception as e:
-        #         pass
-
+        # move_to_zero_position(lrobot, duration=3.0)
+        # move_to_zero_position(rrobot, duration=3.0)
+        
+        p_control_loop(lrobot, rrobot, keyboard)
         logger.info("Program ended")
     except Exception as e:
         logger.error(f"Program execution failed: {e}")
