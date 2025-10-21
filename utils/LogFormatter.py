@@ -22,10 +22,13 @@ class LogFormatter(logging.Formatter):
         return formatter.format(record)
 
 def get_custom_logger():
-    logger = logging.getLogger(__name__)
+    logger = logging.getLogger("Eva")
     logger.setLevel(logging.DEBUG)
-    ch = logging.StreamHandler()
-    ch.setLevel(logging.DEBUG)
-    ch.setFormatter(LogFormatter())
-    logger.addHandler(ch)
+
+    if not logger.handlers:
+        ch = logging.StreamHandler()
+        ch.setLevel(logging.DEBUG)
+        ch.setFormatter(LogFormatter())
+        logger.addHandler(ch)
+        logger.propagate = False
     return logger
