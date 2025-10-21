@@ -1,8 +1,6 @@
 import traceback
-from Eva import Eva
 import constants
-import time
-from pathlib import Path
+from Eva import Eva
 
 from utils import get_custom_logger
 
@@ -19,7 +17,7 @@ def main():
     logger.info("="*50)
 
     try:
-        eva = Eva()
+        eva = Eva(constants.LEFT_ARM_PARAMS, constants.RIGHT_ARM_PARAMS, constants.CALIBRATION_DIR)
         eva.run()
         eva.disconnect()
     except Exception as e:

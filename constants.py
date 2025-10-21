@@ -41,3 +41,39 @@ class ProgramStatus(Enum):
     IDLE = 'idle'
     IN_PROGRESS = 'in_progress'
     EXIT = 'exit'
+
+
+from dataclasses import dataclass
+@dataclass(frozen=True)
+class ArmParams:
+    id:str
+    port:str
+    default_position:dict
+    max_speed = 10
+    error = 5
+
+LEFT_ARM_PARAMS = ArmParams(
+    id="left_arm",
+    port="/dev/tty.usbmodem5AB01583061",
+    default_position={
+        SHOULDER_PAN: 67,
+        SHOULDER_LIFT: -32,
+        ELBOW_FLEX: 0,
+        WRIST_FLEX: 0,
+        WRIST_ROLL: 0,
+        GRIPPER: 0,
+    }
+)
+
+RIGHT_ARM_PARAMS = ArmParams(
+    id="right_arm",
+    port="/dev/tty.usbmodem5AB01584211",
+    default_position={
+        SHOULDER_PAN: 67,
+        SHOULDER_LIFT: -32,
+        ELBOW_FLEX: 0,
+        WRIST_FLEX: 0,
+        WRIST_ROLL: 0,
+        GRIPPER: 0,
+    }
+)
