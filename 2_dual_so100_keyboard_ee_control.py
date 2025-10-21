@@ -11,6 +11,8 @@ import time
 import logging
 import traceback
 import math
+import constants
+from pathlib import Path
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -459,22 +461,22 @@ def main():
         from lerobot.teleoperators.keyboard import KeyboardTeleop, KeyboardTeleopConfig
         
         # Configure dual-arm robots
-        arm1_port = "/dev/ttyACM0"
-        arm2_port = "/dev/ttyACM1"
+        left_arm_port = "/dev/tty.usbmodem5AB01583061"
+        right_arm_port = "/dev/tty.usbmodem5AB01584211"
         
-        print(f"Configuring first arm: {arm1_port}")  
-        print(f"Configuring second arm: {arm2_port}")
+        print(f"Configuring first arm: {left_arm_port}")  
+        print(f"Configuring second arm: {right_arm_port}")
         
         # Create dual-arm robot instances
-        arm1_config = SO100FollowerConfig(port=arm1_port)
-        arm2_config = SO100FollowerConfig(port=arm2_port)
+        left_arm_config = SO100FollowerConfig(port=left_arm_port, id=constants.LEFT_ARM_ID, calibration_dir=Path(constants.CALIBRATION_DIR))
+        right_arm_config = SO100FollowerConfig(port=right_arm_port, id=constants.RIGHT_ARM_ID, calibration_dir=Path(constants.CALIBRATION_DIR))
         
-        arm1_robot = SO100Follower(arm1_config)
-        arm2_robot = SO100Follower(arm2_config)
+        left_arm_robot = SO100Follower(left_arm_config)
+        right_arm_robot = SO100Follower(right_arm_config)
         
         robots = {
-            'arm1': arm1_robot,
-            'arm2': arm2_robot
+            'arm1': left_arm_robot,
+            'arm2': right_arm_robot
         }
         
         # Configure keyboard
@@ -483,9 +485,9 @@ def main():
         
         # Connect devices
         print("Connecting first arm...")
-        arm1_robot.connect()
+        left_arm_robot.connect()
         print("Connecting second arm...")
-        arm2_robot.connect()
+        right_arm_robot.connect()
         print("Connecting keyboard...")
         keyboard.connect()
         
