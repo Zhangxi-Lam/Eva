@@ -1,5 +1,4 @@
 import time
-import logging
 from pathlib import Path
 import constants
 
@@ -17,14 +16,15 @@ class Eva:
     left_arm: SO100Follower
     right_arm: SO100Follower
 
-    def __init__(self, l: constants.ArmParams, r: constants.ArmParams, calibration_dir: str, momentum=1, control_freq=50) -> None:
+    def __init__(self, l: constants.ArmParams, r: constants.ArmParams, calibration_dir: str, speed=10, control_freq=50) -> None:
         self.keyboard = self.init_keyboard()
         self.left_arm_params = l
         self.right_arm_params = r
         self.left_arm = self.init_arm(l, calibration_dir)
         self.right_arm = self.init_arm(r, calibration_dir)
+
+        self.speed = speed
         self.control_interval = 1.0 / control_freq
-        self.momentum = momentum
 
         logger.info(f"Eva initialization complete!")
 
@@ -64,40 +64,43 @@ class Eva:
             robot.send_action(positions)
             time.sleep(self.control_interval)
 
-    def p_control(self):
-        positions = self.left_arm.get_observation()
+    def get_next_position(self, speed):
+        left_positions = self.left_arm.get_observation()
+        right_positions = self.right_arm.get_observation()
         kb_action = self.keyboard.get_action()
         if kb_action:
             # Process keyboard input, update target positions
             for key, _ in kb_action.items():
                 if key == constants.RETURN_KEY:
-                    return constants.ProgramStatus.EXIT, None, positions
-                if key in constants.JOINT_CONTROLS:
-                    joint_name, delta = constants.JOINT_CONTROLS[key]
-                    positions[joint_name] += delta * self.momentum
-            return constants.ProgramStatus.IN_PROGRESS, kb_action, positions
+                    return False, None, None
+                if key in self.left_arm_params.joint_controls:
+                    joint_name, delta = self.left_arm_params.joint_controls[key]
+                    left_positions[joint_name] += delta * speed
+                if key in self.right_arm_params.joint_controls:
+                    joint_name, delta = self.right_arm_params.joint_controls[key]
+                    right_positions[joint_name] += delta * speed
+
+            return True, left_positions, right_positions
         else:
-            return constants.ProgramStatus.IDLE, None, positions
+            return False, left_positions, right_positions
 
     def run(self):
         logger.info(
-            f"Eva running, momentum {self.momentum} interval {self.control_interval}")
+            f"Eva running, speed {self.speed} interval {self.control_interval}")
 
-        last_kb_action = None
         while True:
-            status, kb_action, positions = self.p_control()
-            if status == constants.ProgramStatus.EXIT:
+            has_action, left_positions, right_positions = self.get_next_position(self.speed)
+            if not left_positions:
                 self.move_to_position(self.left_arm, self.left_arm_params.default_position,
                                       self.left_arm_params.max_speed, self.left_arm_params.error)
+                self.move_to_position(self.right_arm, self.right_arm_params.default_position,
+                                      self.right_arm_params.max_speed, self.right_arm_params.error)
                 return
-            if kb_action:
-                self.left_arm.send_action(positions)
-            if kb_action == last_kb_action:
-                self.momentum += 1
-            else:
-                self.momentum = 1
-                last_kb_action = kb_action
-            time.sleep(self.control_interval)
+            if has_action:
+                self.move_to_position(self.left_arm, left_positions,
+                                      self.left_arm_params.max_speed, self.left_arm_params.error)
+                self.move_to_position(self.right_arm, right_positions,
+                                      self.right_arm_params.max_speed, self.right_arm_params.error)
 
     def disconnect(self):
         logger.info(f"Eva disconnecting...")

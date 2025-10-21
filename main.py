@@ -7,8 +7,6 @@ from utils import get_custom_logger
 from lerobot.robots.so100_follower import SO100Follower, SO100FollowerConfig
 from lerobot.teleoperators.keyboard import KeyboardTeleop, KeyboardTeleopConfig
 
-from utils.control_utils import p_control
-
 logger = get_custom_logger()
 
 
