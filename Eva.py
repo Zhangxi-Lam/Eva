@@ -1,9 +1,6 @@
-import time
-from pathlib import Path
 import constants
 from EvaArm import EvaArm
 
-from lerobot.robots.so100_follower import SO100Follower, SO100FollowerConfig
 from lerobot.teleoperators.keyboard import KeyboardTeleop, KeyboardTeleopConfig
 from utils import get_custom_logger
 
@@ -19,6 +16,7 @@ class Eva:
         self.keyboard = self.init_keyboard()
         self.left_arm = EvaArm(l)
         self.right_arm = EvaArm(r)
+
         logger.info(f"Eva initialization complete!")
 
     def init_keyboard(self) -> KeyboardTeleop:

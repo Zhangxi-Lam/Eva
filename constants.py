@@ -69,11 +69,11 @@ RIGHT_ARM_PARAMS = ArmParams(
         'n': (GRIPPER, -1),
     },
     default_position={
-        SHOULDER_PAN: 67,
-        SHOULDER_LIFT: -32,
+        SHOULDER_PAN: 0,
+        SHOULDER_LIFT: -84,
         ELBOW_FLEX: 0,
-        WRIST_FLEX: 0,
-        WRIST_ROLL: 0,
+        WRIST_FLEX: 11,
+        WRIST_ROLL: -5,
         GRIPPER: 0,
     }
 )

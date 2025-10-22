@@ -21,6 +21,9 @@ class EvaArm:
         self.robot = SO100Follower(config)
         self.robot.connect()
     
+    def calibrate(self):
+        return self.robot.calibrate()
+
     def get_observation(self):
         return self.robot.get_observation()
     
@@ -35,27 +38,45 @@ class EvaArm:
             return positions
         return None
             
-    
+    def reach_position(self, target_positions, positions):
+        if not target_positions:
+            return False
+
+        for key, value in target_positions.items():
+            delta = value - positions[key]
+            if abs(delta) > self.params.error:
+                return False
+        return True
+
     def move_to_default_position(self):
         return self.move_to_position(self.params.default_position)
     
-    def move_to_position(self, target_position):
-        logger.info(f"Moving to position {target_position} ")
+    def move_to_position(self, target_positions):
+        logger.info(f"Moving to position {target_positions} ")
+
+        last_position = None
         while True:
             positions = self.robot.get_observation()
-            done = True
-            for joint_name, target_pos in target_position.items():
-                if joint_name in positions:
-                    delta = target_pos - positions[joint_name]
-                    if abs(delta) < self.params.error:
-                        continue
-                    done = False
-                    delta = self.params.max_speed if delta > self.params.max_speed else delta
-                    delta = -self.params.max_speed if delta < -self.params.max_speed else delta
-                    positions[joint_name] += delta
-            if done:
-                logger.info(f"Moving to position {target_position} done!")
+            # Check if robot has reached target_positions
+            if self.reach_position(target_positions, positions):
+                logger.info(f"Moving to position {target_positions} done!")
+                return 
+
+            # Get new positions
+            for joint_name, target_pos in target_positions.items():
+                delta = target_pos - positions[joint_name]
+                delta = self.params.max_speed if delta > self.params.max_speed else delta
+                delta = -self.params.max_speed if delta < -self.params.max_speed else delta
+                positions[joint_name] += delta
+
+            # Check if the new positions is roughly the same as the last positions
+            if self.reach_position(last_position, positions):
+                current_positions = self.robot.get_observation()
+                logger.warning(f"Moving to position {target_positions} stuck at {current_positions}!")
                 return
+
+            # Move to new positions and wait
             self.robot.send_action(positions)
+            last_position = positions
             time.sleep(self.params.control_interval)
 
