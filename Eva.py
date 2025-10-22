@@ -39,16 +39,16 @@ class Eva:
                     left_positions = self.left_arm.get_next_position(key)
                     right_positions = self.right_arm.get_next_position(key)
             if left_positions:
-                self.left_arm.move_to_position(left_positions)
+                self.left_arm.move_to_positions(left_positions)
             if right_positions:
-                self.right_arm.move_to_position(right_positions)
+                self.right_arm.move_to_positions(right_positions)
 
     def disconnect(self):
         logger.info(f"Eva disconnecting...")
         
         # Move back to the default position before disconnect
-        self.left_arm.move_to_default_position()
-        self.right_arm.move_to_default_position()
+        self.left_arm.move_to_default_positions()
+        self.right_arm.move_to_default_positions()
 
         # Disconnect
         self.keyboard.disconnect()

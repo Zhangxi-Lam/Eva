@@ -24,21 +24,22 @@ class EvaArm:
     def calibrate(self):
         return self.robot.calibrate()
 
-    def get_observation(self):
-        return self.robot.get_observation()
+    def get_current_positions(self) -> constants.ArmPositions:
+        positions = self.robot.get_observation()
+        return constants.ArmPositions(positions)
     
     def disconnect(self):
         return self.robot.disconnect()
     
-    def get_next_position(self, key:str):
+    def get_next_position(self, key:str) -> constants.ArmPositions:
         if key in self.params.joint_controls:
-            positions = self.robot.get_observation()
+            positions = self.get_current_positions()
             joint_name, delta = self.params.joint_controls[key]
             positions[joint_name] += delta * self.params.speed
             return positions
         return None
             
-    def reach_position(self, target_positions, positions):
+    def reach_position(self, target_positions: constants.ArmPositions, positions: constants.ArmPositions):
         if not target_positions:
             return False
 
@@ -48,15 +49,15 @@ class EvaArm:
                 return False
         return True
 
-    def move_to_default_position(self):
-        return self.move_to_position(self.params.default_position)
+    def move_to_default_positions(self):
+        return self.move_to_positions(self.params.default_positions)
     
-    def move_to_position(self, target_positions):
+    def move_to_positions(self, target_positions: constants.ArmPositions):
         logger.info(f"Moving to position {target_positions} ")
 
         last_position = None
         while True:
-            positions = self.robot.get_observation()
+            positions = self.get_current_positions()
             # Check if robot has reached target_positions
             if self.reach_position(target_positions, positions):
                 logger.info(f"Moving to position {target_positions} done!")
@@ -71,7 +72,7 @@ class EvaArm:
 
             # Check if the new positions is roughly the same as the last positions
             if self.reach_position(last_position, positions):
-                current_positions = self.robot.get_observation()
+                current_positions = self.get_current_positions()
                 logger.warning(f"Moving to position {target_positions} stuck at {current_positions}!")
                 return
 

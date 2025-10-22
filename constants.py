@@ -1,5 +1,6 @@
 from pathlib import Path
 from dataclasses import dataclass
+from typing import TypedDict
 
 # Robot servo
 SHOULDER_PAN = "shoulder_pan.pos"
@@ -11,15 +12,22 @@ GRIPPER = "gripper.pos"
 
 RETURN_KEY = 'm'
 
+
+class ArmPositions(dict[str, float]):
+    def __str__(self):
+        return str("\n" + "\t\n".join(f"{k}: {v:.1f}" for k, v in self.items()) + "\n")
+
+
+
 @dataclass(frozen=True)
 class ArmParams:
     id: str
     port: str
     joint_controls: dict
-    default_position: dict
+    default_positions: ArmPositions
     control_interval = 1.0 / 50
     speed = 10
-    max_speed = 10 
+    max_speed = 10
     error = 5
     calibration_dir = Path("./calibration")
 
@@ -41,14 +49,14 @@ LEFT_ARM_PARAMS = ArmParams(
         '6': (GRIPPER, 1),
         'y': (GRIPPER, -1),
     },
-    default_position={
+    default_positions=ArmPositions({
         SHOULDER_PAN: 67,
         SHOULDER_LIFT: -32,
         ELBOW_FLEX: 0,
         WRIST_FLEX: 0,
         WRIST_ROLL: 0,
         GRIPPER: 0,
-    }
+    })
 )
 
 RIGHT_ARM_PARAMS = ArmParams(
@@ -68,12 +76,12 @@ RIGHT_ARM_PARAMS = ArmParams(
         'h': (GRIPPER, 1),
         'n': (GRIPPER, -1),
     },
-    default_position={
+    default_positions=ArmPositions({
         SHOULDER_PAN: 0,
         SHOULDER_LIFT: -84,
         ELBOW_FLEX: 0,
         WRIST_FLEX: 11,
         WRIST_ROLL: -5,
         GRIPPER: 0,
-    }
+    })
 )
