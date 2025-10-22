@@ -1,6 +1,5 @@
+from pathlib import Path
 from dataclasses import dataclass
-from enum import Enum
-CALIBRATION_DIR = "./calibration"
 
 # Robot servo
 SHOULDER_PAN = "shoulder_pan.pos"
@@ -12,21 +11,17 @@ GRIPPER = "gripper.pos"
 
 RETURN_KEY = 'm'
 
-
-class ProgramStatus(Enum):
-    IDLE = 'idle'
-    IN_PROGRESS = 'in_progress'
-    EXIT = 'exit'
-
-
 @dataclass(frozen=True)
 class ArmParams:
     id: str
     port: str
     joint_controls: dict
     default_position: dict
-    max_speed = 10
+    control_interval = 1.0 / 50
+    speed = 10
+    max_speed = 10 
     error = 5
+    calibration_dir = Path("./calibration")
 
 
 LEFT_ARM_PARAMS = ArmParams(
