@@ -1,5 +1,6 @@
 import logging
 
+
 class LogFormatter(logging.Formatter):
     grey = "\x1b[38;20m"
     yellow = "\x1b[33;20m"
@@ -20,6 +21,7 @@ class LogFormatter(logging.Formatter):
         log_fmt = self.FORMATS.get(record.levelno)
         formatter = logging.Formatter(log_fmt)
         return formatter.format(record)
+
 
 def get_custom_logger():
     logger = logging.getLogger("Eva")

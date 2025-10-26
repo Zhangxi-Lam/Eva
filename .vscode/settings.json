@@ -1,8 +1,15 @@
 {
     "cSpell.words": [
         "lconfig",
-        "rconfig",
+        "lerobot",
         "lrobot",
-        "rrobot"
-    ]
+        "rconfig",
+        "rrobot",
+        "draccus"
+    ],
+    "[python]": {
+        "editor.formatOnSaveMode": "file",
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "eeyore.yapf"
+    }
 }

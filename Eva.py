@@ -13,7 +13,8 @@ class Eva:
     left_arm: EvaArm
     right_arm: EvaArm
 
-    def __init__(self, left_arm_config: EvaRobotConfig, right_arm_config: EvaRobotConfig,
+    def __init__(self, left_arm_config: EvaRobotConfig,
+                 right_arm_config: EvaRobotConfig,
                  foot_config: EvaRobotConfig):
         self.keyboard = self.init_keyboard()
         self.left_arm = EvaArm(left_arm_config)

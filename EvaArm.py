@@ -9,8 +9,9 @@ from constants import EvaRobotConfig
 
 logger = get_custom_logger()
 
+
 class EvaArm(EvaRobot):
+
     def __init__(self, config: EvaRobotConfig):
         super().__init__(config)
         self.bus.connect()
-    

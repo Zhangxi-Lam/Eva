@@ -12,7 +12,7 @@ logger = get_custom_logger()
 
 def main():
     logger.info("Starting")
-    logger.info("="*50)
+    logger.info("=" * 50)
 
     try:
         eva = Eva(LEFT_ARM_CONFIG, RIGHT_ARM_CONFIG, FOOT_CONFIG)
