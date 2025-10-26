@@ -15,12 +15,16 @@ class EvaRobot:
     config: EvaRobotConfig
     bus: FeetechMotorsBus
 
-    def __init__(self, config: EvaRobotConfig):
+    # If bus is provided, use it, otherwise create a new one
+    def __init__(self, config: EvaRobotConfig, bus: FeetechMotorsBus = None):
         self.config = config
-        self.bus = FeetechMotorsBus(port=config.port,
-                                    motors=config.motors,
-                                    calibration=self._load_calibration(
-                                        config.calibration_dir))
+        if bus is not None:
+            self.bus = bus
+        else:
+            self.bus = FeetechMotorsBus(port=config.port,
+                                        motors=config.motors,
+                                        calibration=self._load_calibration(
+                                            config.calibration_dir))
 
     @property
     def is_connected(self) -> bool:
