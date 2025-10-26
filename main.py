@@ -1,5 +1,5 @@
 import traceback
-import constants
+from constants import LEFT_ARM_CONFIG, RIGHT_ARM_CONFIG, FOOT_CONFIG
 from Eva import Eva
 
 from utils import get_custom_logger
@@ -15,7 +15,7 @@ def main():
     logger.info("="*50)
 
     try:
-        eva = Eva(constants.LEFT_ARM_CONFIG, constants.RIGHT_ARM_CONFIG)
+        eva = Eva(LEFT_ARM_CONFIG, RIGHT_ARM_CONFIG, FOOT_CONFIG)
         eva.run()
         eva.disconnect()
     except Exception as e:

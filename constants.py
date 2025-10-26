@@ -9,9 +9,9 @@ ELBOW_FLEX = "elbow_flex.pos"
 WRIST_FLEX = "wrist_flex.pos"
 WRIST_ROLL = "wrist_roll.pos"
 GRIPPER = "gripper.pos"
-LEFT_WHEEL = "left_wheel"
-RIGHT_WHEEL = "right_wheel"
-MID_WHEEL = "mid_wheel"
+LEFT_WHEEL = "left_wheel.pos"
+RIGHT_WHEEL = "right_wheel.pos"
+MID_WHEEL = "mid_wheel.pos"
 
 RETURN_KEY = 'm'
 
@@ -108,10 +108,17 @@ FOOT_CONFIG = EvaRobotConfig(
     id="base_foot",
     port="/dev/tty.usbmodem5AB01584211",
     motors={
-        LEFT_WHEEL: Motor(7, "sts3215", MotorNormMode.RANGE_M100_100),
-        RIGHT_WHEEL: Motor(8, "sts3215", MotorNormMode.RANGE_M100_100),
-        MID_WHEEL: Motor(9, "sts3215", MotorNormMode.RANGE_M100_100),
+        "left_wheel": Motor(7, "sts3215", MotorNormMode.RANGE_M100_100),
+        "right_wheel": Motor(8, "sts3215", MotorNormMode.RANGE_M100_100),
+        "mid_wheel": Motor(9, "sts3215", MotorNormMode.RANGE_M100_100),
     },
-    robot_controls={},
+    robot_controls={
+        '7': (LEFT_WHEEL, 1),
+        'u': (LEFT_WHEEL, -1),
+        '8': (RIGHT_WHEEL, 1),
+        'i': (RIGHT_WHEEL, -1), 
+        '9': (MID_WHEEL, 1),
+        'o': (MID_WHEEL, -1),
+    },
     default_position=None
 )
