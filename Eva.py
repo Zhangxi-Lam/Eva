@@ -1,4 +1,4 @@
-import constants
+from constants import EvaRobotConfig, RETURN_KEY
 from EvaArm import EvaArm
 
 from lerobot.teleoperators.keyboard import KeyboardTeleop, KeyboardTeleopConfig
@@ -12,10 +12,10 @@ class Eva:
     left_arm: EvaArm
     right_arm: EvaArm
 
-    def __init__(self, l: constants.ArmParams, r: constants.ArmParams):
+    def __init__(self, left_arm_config: EvaRobotConfig, right_arm_config: EvaRobotConfig):
         self.keyboard = self.init_keyboard()
-        self.left_arm = EvaArm(l)
-        self.right_arm = EvaArm(r)
+        self.left_arm = EvaArm(left_arm_config)
+        self.right_arm = EvaArm(right_arm_config)
 
         logger.info(f"Eva initialization complete!")
 
@@ -30,25 +30,25 @@ class Eva:
 
         while True:
             kb_action = self.keyboard.get_action()
-            left_positions, right_positions = None, None
+            left_position, right_position = None, None
             if kb_action:
                 # Process keyboard input, update target positions
                 for key, _ in kb_action.items():
-                    if key == constants.RETURN_KEY:
+                    if key == RETURN_KEY:
                         return
-                    left_positions = self.left_arm.get_next_position(key)
-                    right_positions = self.right_arm.get_next_position(key)
-            if left_positions:
-                self.left_arm.move_to_positions(left_positions)
-            if right_positions:
-                self.right_arm.move_to_positions(right_positions)
+                    left_position = self.left_arm.get_next_position(key)
+                    right_position = self.right_arm.get_next_position(key)
+            if left_position:
+                self.left_arm.move_to_position_in_loop(left_position)
+            if right_position:
+                self.right_arm.move_to_position_in_loop(right_position)
 
     def disconnect(self):
         logger.info(f"Eva disconnecting...")
         
         # Move back to the default position before disconnect
-        self.left_arm.move_to_default_positions()
-        self.right_arm.move_to_default_positions()
+        self.left_arm.move_to_default_position()
+        self.right_arm.move_to_default_position()
 
         # Disconnect
         self.keyboard.disconnect()

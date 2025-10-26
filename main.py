@@ -15,7 +15,7 @@ def main():
     logger.info("="*50)
 
     try:
-        eva = Eva(constants.LEFT_ARM_PARAMS, constants.RIGHT_ARM_PARAMS)
+        eva = Eva(constants.LEFT_ARM_CONFIG, constants.RIGHT_ARM_CONFIG)
         eva.run()
         eva.disconnect()
     except Exception as e:
